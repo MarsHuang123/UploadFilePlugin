@@ -10,7 +10,9 @@ $ cordova create upload com.example.UploadFile Upload
 Install the plugin
 
 $ cd upload
+
 $ cordova plugin add https://github.com/MarsHuang123/UploadFilePlugin.git
+
 Edit www/js/index.js and add the following code inside onDeviceReady
 
     var success = function(message) {
