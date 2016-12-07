@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns="http://www.phonegap.com/ns/plugins/1.0"
+        id="com.example.upload"
+        version="0.7.0">
+
+  <name>Upload</name>
+
+  <engines>
+    <engine name="cordova" version=">=3.4.0"/>
+  </engines>
+
+  <asset src="www/upload.js" target="js/upload.js"/>
+
+  <js-module src="www/upload.js" name="upload">
+    <clobbers target="upload" />
+  </js-module>
+
+
+  <platform name="ios">
+    
+    <config-file target="config.xml" parent="/widget">
+      <feature name="Upload">
+        <param name="ios-package" value="UploadFile" />
+      </feature>
+    </config-file>
+
+    <header-file src="src/ios/UploadFile.h" target-dir="UploadPlugin"/>
+    <source-file src="src/ios/UploadFile.m" target-dir="UploadPlugin"/>
+    
+    <header-file src="src/ios/SoundQueueManager.h" target-dir="UploadPlugin"/>
+    <source-file src="src/ios/SoundQueueManager.m" target-dir="UploadPlugin"/>
+    
+    <header-file src="src/ios/SoundManagerConstant.h" target-dir="UploadPlugin"/>
+  </platform>
+
+
+</plugin>
