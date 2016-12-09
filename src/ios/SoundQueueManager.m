@@ -9,6 +9,9 @@
 #define MLWeakObject(obj) __typeof__(obj) __weak
 #define MLWeakSelf MLWeakObject(self)
 
+#define kCaseIDKey @"caseID"
+#define kIndexKey @"Index"
+
 #define kUpload @"upload"
 #define kRetrieve @"retrieve"
 
@@ -49,11 +52,6 @@
 
 #pragma mark - local data
 
-- (NSString *)dataPath
-{
-    return DataPath(@"");
-}
-
 - (NSMutableArray *)scanPath:(NSString *)sPath {
     
     NSMutableArray *result = [NSMutableArray array];
@@ -68,25 +66,58 @@
         for(i=0;i<contentOfDirectory.count;i++)
         {
             NSString *fileName = [contentOfDirectory objectAtIndex:i];
-            NSCharacterSet* notDigits = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
-            if ([fileName rangeOfCharacterFromSet:notDigits].location == NSNotFound)
-            {
-                [result addObject:fileName];
+            NSDictionary *dicFileInfo = [self validateWithFileName:fileName];
+            if (dicFileInfo) {
+                [result addObject:dicFileInfo];
             }
-            
         }
         
     }
     return result;
 }
 
-- (void)completeTaskWithTask:(NSString *)pUploadTask
+- (NSDictionary *)validateWithFileName:(NSString *)pFileName
 {
-    
-    if ([[NSFileManager defaultManager] fileExistsAtPath:DataPath(pUploadTask)]){
-        if ([[NSFileManager defaultManager] removeItemAtPath:DataPath(pUploadTask) error:nil]) {
-            [_maSound removeObject:pUploadTask];
+    NSDictionary *dic = nil;
+    NSString *splitMark = @"_";
+    if ([pFileName rangeOfString:splitMark].location != NSNotFound) {
+        NSArray *arr = [pFileName componentsSeparatedByString:splitMark];
+        if (arr.count == 2) {
+            
+            NSCharacterSet* notDigits = [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+            if ([arr[0] rangeOfCharacterFromSet:notDigits].location == NSNotFound && [arr[1] rangeOfCharacterFromSet:notDigits].location == NSNotFound)
+            {
+                dic = @{kCaseIDKey:arr[0],
+                        kIndexKey:arr[1]};
+            }
+            
         }
+    }
+    return dic;
+}
+
+- (void)completeTaskWithCaseID:(NSString *)pCaseID index:(NSInteger)pIndex
+{
+    NSString *fileName = [NSString stringWithFormat:@"%@_%ld", pCaseID, pIndex];
+    if ([[NSFileManager defaultManager] fileExistsAtPath:DataPath(fileName)]){
+        
+        if (![[NSFileManager defaultManager] fileExistsAtPath:FinishDataPath(@"")]) {
+            [[NSFileManager defaultManager] createDirectoryAtPath:FinishDataPath(@"")
+                                      withIntermediateDirectories:NO
+                                                       attributes:nil
+                                                            error:nil];
+        }
+        
+        if ([[NSFileManager defaultManager] fileExistsAtPath:FinishDataPath(fileName)]){
+            [[NSFileManager defaultManager] removeItemAtPath:DataPath(fileName) error:nil];
+        }
+        else if ([[NSFileManager defaultManager] copyItemAtPath:DataPath(fileName)
+                                                    toPath:FinishDataPath(fileName)
+                                                    error:nil]) {
+            [[NSFileManager defaultManager] removeItemAtPath:DataPath(fileName) error:nil];
+        }
+        
+        
     }
     
 }
@@ -114,7 +145,7 @@
         [_timer invalidate];
         _timer = nil;
     }
-    NSLog(@"%@", DataPath(@""));
+    
     if (![[NSFileManager defaultManager] fileExistsAtPath:DataPath(@"")]) {
         [[NSFileManager defaultManager] createDirectoryAtPath:DataPath(@"")
                                   withIntermediateDirectories:NO
@@ -149,13 +180,15 @@
     
     if ([uploader sessionStatus] == SessionStatusAvailable && _maSound.count != 0) {
         [uploader setSessionStatusWithStatus:SessionStatusBusy];
-        NSString *uploadTask = [_maSound objectAtIndex:0];
+        NSDictionary *uploadTask = [_maSound objectAtIndex:0];
         
-        [uploader addTaskToQueueWithUploadTask:uploadTask
+        [uploader addTaskToQueueWithUploadTask:uploadTask[kCaseIDKey]
+                                         index:[uploadTask[kIndexKey] integerValue]
                                completionBlock:^(TaskStatus taskStatus) {
                                    
                                    if (taskStatus == TaskStatusUploadFinished) {
-                                       [weakSelf completeTaskWithTask:uploadTask];
+                                       [weakSelf completeTaskWithCaseID:uploadTask[kCaseIDKey]
+                                                                  index:[uploadTask[kIndexKey] integerValue]];
                                        
                                    }
                                    
@@ -223,10 +256,12 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
 }
 
 - (void)addTaskToQueueWithUploadTask:(NSString *)pUploadTask
+                               index:(NSInteger)pIndex
                      completionBlock:(void(^)(TaskStatus taskStatus))pCompletionBlock
 {
     
     [self retrieveUploadedSizeWithIdentifier:pUploadTask
+                                       index:pIndex
                              completionBlock:^(NSInteger uploadedSize, NSError *error) {
                                  
                                  if (error) {
@@ -236,6 +271,7 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
                                      
                                      [self prepareUploadTaskWithTaskIdentifier:pUploadTask
                                                                  startPosition:uploadedSize
+                                                                         index:pIndex
                                                                completionBlock:^(BOOL result) {
                                                                    if (result) {
                                                                        pCompletionBlock(TaskStatusUploadFinished);
@@ -251,16 +287,17 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
 
 - (void)prepareUploadTaskWithTaskIdentifier:(NSString *)pTaskIdentifier
                               startPosition:(NSInteger)pStartPosition
+                                      index:(NSInteger)pIndex
                             completionBlock:(void(^)(BOOL result))pCompletionBlock
 {
     
-    
-    if (![[NSFileManager defaultManager] fileExistsAtPath:DataPath(pTaskIdentifier)] || ![[NSFileManager defaultManager] isReadableFileAtPath:DataPath(pTaskIdentifier)]){
+    NSString *fileName = [NSString stringWithFormat:@"%@_%ld", pTaskIdentifier, pIndex];
+    if (![[NSFileManager defaultManager] fileExistsAtPath:DataPath(fileName)] || ![[NSFileManager defaultManager] isReadableFileAtPath:DataPath(fileName)]){
         pCompletionBlock(NO);
         return;
     }
     
-    NSData *fullData = [NSData dataWithContentsOfFile:DataPath(pTaskIdentifier)];
+    NSData *fullData = [NSData dataWithContentsOfFile:DataPath(fileName)];
     
     NSLog(@"%@", DataPath(pTaskIdentifier));
     NSData *data = [fullData componentsSeparatedFromByte:pStartPosition];
@@ -286,7 +323,7 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
         void(^inner_block)(NSInteger) = weak_next;
         
         [self uploadOnePartWithTaskIdentifier:pTaskIdentifier
-                                        index:i
+                                        index:pIndex
                                    base64Data:[_maUploadingQueueForTask[i] base64EncodedString]
                                 contentLength:fullData.length
                               completionBlock:^(BOOL result) {
@@ -308,10 +345,12 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
 
 #pragma mark - data access
 - (void)retrieveUploadedSizeWithIdentifier:(NSString *)pIdetifier
+                                     index:(NSInteger)pIndex
                            completionBlock:(void(^)(NSInteger uploadedSize, NSError *error))pCompletionBlock
 {
     NSDictionary *dicParam = nil;
-    NSDictionary *dicDetail = @{@"CaseID":pIdetifier};
+    NSDictionary *dicDetail = @{@"CaseID":pIdetifier,
+                                @"Index":@(pIndex),};
     dicParam = @{@"Requests":dicDetail};
     
     [self urlSessionManager:@""
@@ -330,7 +369,7 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
 }
 
 - (void)uploadOnePartWithTaskIdentifier:(NSString *)pTaskIdentifier
-                                  index:(NSInteger)pInteger
+                                  index:(NSInteger)pIndex
                              base64Data:(NSString *)pBase64Data
                           contentLength:(NSInteger)pContentLength
                         completionBlock:(void(^)(BOOL result))pCompletionBlock
@@ -340,6 +379,7 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
     NSDictionary *dicParam = nil;
     NSDictionary *dicDetail = @{@"CaseID":pTaskIdentifier,
         @"LoginID":_loginID,
+        @"Index":@(pIndex),
         @"CustomerSatisfactionVoiceFile":pBase64Data};
     dicParam = @{@"Requests":dicDetail};
     
@@ -369,7 +409,6 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
     
     NSError *error;
     
-//    NSURLSessionConfiguration *configuration = [NSURLSessionConfiguration backgroundSessionConfigurationWithIdentifier:kBackgroundRefreshIdentifier];
     _session = [NSURLSession sessionWithConfiguration:[NSURLSessionConfiguration defaultSessionConfiguration] delegate:self delegateQueue:nil];
     
     NSURL *url = nil;

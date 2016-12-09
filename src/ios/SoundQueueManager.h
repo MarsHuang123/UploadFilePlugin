@@ -28,7 +28,6 @@ typedef NS_ENUM(NSInteger, SessionStatus) {
 + (SoundQueueManager *)sharedInstance;
 
 - (BOOL)uploaderRunning;
-- (NSString *)dataPath;
 - (void)resumeWithLoginID:(NSString *)pLogninID;
 
 @end
@@ -38,6 +37,7 @@ typedef NS_ENUM(NSInteger, SessionStatus) {
 + (Uploader *)sharedInstance;
 
 - (void)addTaskToQueueWithUploadTask:(NSString *)pUploadTask
+                               index:(NSInteger)pIndex
                      completionBlock:(void(^)(TaskStatus taskStatus))pCompletionBlock;
 - (SessionStatus)sessionStatus;
 - (void)setLoginID:(NSString *)pLoginID;
