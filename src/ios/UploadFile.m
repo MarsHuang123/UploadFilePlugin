@@ -14,43 +14,52 @@
 - (void)isRunning:(CDVInvokedUrlCommand*)command
 {
     
-    SoundQueueManager *queue = [SoundQueueManager sharedInstance];
-    int runing = [queue uploaderRunning];
+    [self.commandDelegate runInBackground:^{
+        SoundQueueManager *queue = [SoundQueueManager sharedInstance];
+        int runing = [queue uploaderRunning];
+        
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus:CDVCommandStatus_OK
+                                   messageAsInt:runing];
+        
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
     
-    CDVPluginResult* result = [CDVPluginResult
-                               resultWithStatus:CDVCommandStatus_OK
-                               messageAsInt:runing];
-    
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
 }
 
 - (void)dataPath:(CDVInvokedUrlCommand*)command
 {
     
-    SoundQueueManager *queue = [SoundQueueManager sharedInstance];
-    NSString *path = [queue dataPath];
     
-    CDVPluginResult* result = [CDVPluginResult
-                               resultWithStatus:CDVCommandStatus_OK
-                               messageAsString:path];
-    
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    [self.commandDelegate runInBackground:^{
+        SoundQueueManager *queue = [SoundQueueManager sharedInstance];
+        NSString *path = [queue dataPath];
+        
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus:CDVCommandStatus_OK
+                                   messageAsString:path];
+        
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
 }
 
 - (void)resume:(CDVInvokedUrlCommand*)command
 {
     
-    NSString* LoginID = [[command arguments] objectAtIndex:0];
     
-    SoundQueueManager *queue = [SoundQueueManager sharedInstance];
-    [queue resumeWithLoginID:LoginID];
-    
-    int runing = [queue uploaderRunning];
-    CDVPluginResult* result = [CDVPluginResult
-                               resultWithStatus:CDVCommandStatus_OK
-                               messageAsInt:runing];
-    
-    [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    [self.commandDelegate runInBackground:^{
+        NSString* LoginID = [[command arguments] objectAtIndex:0];
+        
+        SoundQueueManager *queue = [SoundQueueManager sharedInstance];
+        [queue resumeWithLoginID:LoginID];
+        
+        int runing = [queue uploaderRunning];
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus:CDVCommandStatus_OK
+                                   messageAsInt:runing];
+        
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
 }
 
 @end

@@ -51,6 +51,10 @@
 }
 
 #pragma mark - local data
+- (NSString *)dataPath
+{
+    return DataPath(@"");
+}
 
 - (NSMutableArray *)scanPath:(NSString *)sPath {
     

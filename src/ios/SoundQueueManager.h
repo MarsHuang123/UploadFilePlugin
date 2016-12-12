@@ -26,7 +26,7 @@ typedef NS_ENUM(NSInteger, SessionStatus) {
 @interface SoundQueueManager : NSObject
 
 + (SoundQueueManager *)sharedInstance;
-
+- (NSString *)dataPath;
 - (BOOL)uploaderRunning;
 - (void)resumeWithLoginID:(NSString *)pLogninID;
 

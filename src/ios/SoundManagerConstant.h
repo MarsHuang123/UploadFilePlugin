@@ -14,10 +14,12 @@
 #define kApiKey @"a2ff41f0-ded0-4040-ab17-ba0f1aa4e12b"
 
 #define Data @"DataForder"
+#define FinishData @"FinishDataForder"
 
 #define CachesPath(name) [[[NSHomeDirectory() stringByAppendingPathComponent:@"Library"] stringByAppendingPathComponent:@"Caches"] stringByAppendingPathComponent:name]
 #define StructurePath(name) [[[[NSHomeDirectory() stringByAppendingPathComponent:@"Library"] stringByAppendingPathComponent:@"Caches"] stringByAppendingPathComponent:@"StructureFolder"] stringByAppendingPathComponent:name]
 #define DataPath(name) [[[[NSHomeDirectory() stringByAppendingPathComponent:@"Library"] stringByAppendingPathComponent:@"Caches"] stringByAppendingPathComponent:Data] stringByAppendingPathComponent:name]
+#define FinishDataPath(name) [[[[NSHomeDirectory() stringByAppendingPathComponent:@"Library"] stringByAppendingPathComponent:@"Caches"] stringByAppendingPathComponent:FinishData] stringByAppendingPathComponent:name]
 
 #define CheckNilAndNull(obj) ((obj == nil || [obj isKindOfClass:[NSNull class]]) ? YES : NO)
 #define kBaseURL @"http://csdtest.acer.com.cn/MobilityCssApi/api/CaseList"
