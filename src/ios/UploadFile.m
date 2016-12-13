@@ -9,6 +9,10 @@
 #import "UploadFile.h"
 #import "SoundQueueManager.h"
 
+@interface UploadFile()<SoundQueueManagerDelegate>
+
+@end
+
 @implementation UploadFile
 
 - (void)isRunning:(CDVInvokedUrlCommand*)command
@@ -48,9 +52,13 @@
     
     
     [self.commandDelegate runInBackground:^{
+        
+        
+        
         NSString* LoginID = [[command arguments] objectAtIndex:0];
         
         SoundQueueManager *queue = [SoundQueueManager sharedInstance];
+        queue.delegate = self;
         [queue resumeWithLoginID:LoginID];
         
         int runing = [queue uploaderRunning];
@@ -60,6 +68,23 @@
         
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
     }];
+}
+
+#pragma mark - SoundQueueManagerDelegate
+- (void)uploadFinishWithCaseID:(NSString *)pCaseID
+{
+    
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            NSString *js = [NSString stringWithFormat:@"upload.uploadFinish('%@');", pCaseID];
+            NSLog(@"%@", js);
+//            [self.commandDelegate evalJs:js];
+
+            [self.webView stringByEvaluatingJavaScriptFromString:js];
+        });
+        
+    });
 }
 
 @end

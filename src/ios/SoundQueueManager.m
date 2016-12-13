@@ -103,6 +103,12 @@
 - (void)completeTaskWithCaseID:(NSString *)pCaseID index:(NSInteger)pIndex
 {
     NSString *fileName = [NSString stringWithFormat:@"%@_%ld", pCaseID, pIndex];
+    
+    if (self.delegate != nil && [self.delegate respondsToSelector:@selector(uploadFinishWithCaseID:)]) {
+        
+        [self.delegate uploadFinishWithCaseID:fileName];
+    }
+    
     if ([[NSFileManager defaultManager] fileExistsAtPath:DataPath(fileName)]){
         
         if (![[NSFileManager defaultManager] fileExistsAtPath:FinishDataPath(@"")]) {
@@ -139,6 +145,7 @@
 
 - (void)resumeWithLoginID:(NSString *)pLogninID
 {
+    NSLog(@"%@", DataPath(@""));
     if (pLogninID.length == 0) {
         NSLog(@"invalid loginID! launch loading failed!");
         return;
@@ -157,12 +164,17 @@
                                                         error:nil];
     }
     
-    _timer = [NSTimer scheduledTimerWithTimeInterval:5
-                                                     target:self
-                                                   selector:@selector(upload)
-                                                   userInfo:nil
-                                                    repeats:YES];
+    [self performSelectorOnMainThread:@selector(initTimer) withObject:nil waitUntilDone:NO];
+    
 
+}
+
+- (void)initTimer {
+    _timer = [NSTimer scheduledTimerWithTimeInterval:5
+                                              target:self
+                                            selector:@selector(upload)
+                                            userInfo:nil
+                                             repeats:YES];
 }
 
 - (void)upload
@@ -197,6 +209,7 @@
                                    }
                                    
                                    [weakSelf setSessionStatusWithStatus:SessionStatusAvailable];
+                                   
                                }];
     }
     else{

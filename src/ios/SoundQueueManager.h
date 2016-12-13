@@ -23,7 +23,15 @@ typedef NS_ENUM(NSInteger, SessionStatus) {
 
 @class UploadTask;
 
+@protocol SoundQueueManagerDelegate <NSObject>
+
+- (void)uploadFinishWithCaseID:(NSString *)pCaseID;
+
+@end
+
 @interface SoundQueueManager : NSObject
+
+@property (nonatomic, assign) id<SoundQueueManagerDelegate> delegate;
 
 + (SoundQueueManager *)sharedInstance;
 - (NSString *)dataPath;
