@@ -9,6 +9,8 @@
 #import "UploadFile.h"
 #import "SoundQueueManager.h"
 
+#import "SoundManagerConstant.h"
+
 @interface UploadFile()<SoundQueueManagerDelegate>
 
 @end
@@ -51,15 +53,18 @@
 {
     
     
+    NSLog(@"%@",DataPath(@""));
     [self.commandDelegate runInBackground:^{
         
         
-        
-        NSString* LoginID = [[command arguments] objectAtIndex:0];
+        NSArray *maArgs = [command arguments];
+        NSString* LoginID = [maArgs objectAtIndex:0];
+        NSMutableArray *maFiles = [maArgs objectAtIndex:1];
         
         SoundQueueManager *queue = [SoundQueueManager sharedInstance];
         queue.delegate = self;
-        [queue resumeWithLoginID:LoginID];
+        [queue startWithUploadFiles:maFiles loginID:LoginID];
+//        [queue resumeWithLoginID:LoginID];
         
         int runing = [queue uploaderRunning];
         CDVPluginResult* result = [CDVPluginResult
@@ -71,20 +76,50 @@
 }
 
 #pragma mark - SoundQueueManagerDelegate
-- (void)uploadFinishWithCaseID:(NSString *)pCaseID
+- (void)uploadFinishWithCaseID:(NSString *)pCaseID succesful:(BOOL)pSuccesful
 {
     
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSString *js = [NSString stringWithFormat:@"upload.uploadFinish('%@');", pCaseID];
-            NSLog(@"%@", js);
-//            [self.commandDelegate evalJs:js];
+            NSString *js = [NSString stringWithFormat:@"upload.uploadFinish('%@',%ld);", pCaseID, (NSInteger)pSuccesful];
 
             [self.webView stringByEvaluatingJavaScriptFromString:js];
         });
         
     });
+}
+
+- (void)getFilesStatus:(CDVInvokedUrlCommand*)command
+{
+    
+    [self.commandDelegate runInBackground:^{
+        
+        SoundQueueManager *queue = [SoundQueueManager sharedInstance];
+        
+        
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus:CDVCommandStatus_OK
+                                   messageAsArray:[queue getAllFiles]];
+        
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
+}
+
+- (void)stop:(CDVInvokedUrlCommand*)command
+{
+    
+    [self.commandDelegate runInBackground:^{
+        
+        SoundQueueManager *queue = [SoundQueueManager sharedInstance];
+        
+        
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus:CDVCommandStatus_OK
+                                   messageAsInt:[queue stop]];
+        
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+    }];
 }
 
 @end

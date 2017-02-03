@@ -16,10 +16,10 @@
 #define Data @"DataForder"
 #define FinishData @"FinishDataForder"
 
-#define CachesPath(name) [[[NSHomeDirectory() stringByAppendingPathComponent:@"Library"] stringByAppendingPathComponent:@"Caches"] stringByAppendingPathComponent:name]
-#define StructurePath(name) [[[[NSHomeDirectory() stringByAppendingPathComponent:@"Library"] stringByAppendingPathComponent:@"Caches"] stringByAppendingPathComponent:@"StructureFolder"] stringByAppendingPathComponent:name]
-#define DataPath(name) [[[[NSHomeDirectory() stringByAppendingPathComponent:@"Library"] stringByAppendingPathComponent:@"Caches"] stringByAppendingPathComponent:Data] stringByAppendingPathComponent:name]
-#define FinishDataPath(name) [[[[NSHomeDirectory() stringByAppendingPathComponent:@"Library"] stringByAppendingPathComponent:@"Caches"] stringByAppendingPathComponent:FinishData] stringByAppendingPathComponent:name]
+//#define CachesPath(name) [[[NSHomeDirectory() stringByAppendingPathComponent:@"Library"] stringByAppendingPathComponent:@"Caches"] stringByAppendingPathComponent:name]
+#define CachesPath [[NSHomeDirectory() stringByAppendingPathComponent:@"Documents"] stringByAppendingPathComponent:@"Caches"]
+#define DataPath(name) [[CachesPath stringByAppendingPathComponent:Data] stringByAppendingPathComponent:name]
+#define FinishDataPath(name) [[CachesPath stringByAppendingPathComponent:FinishData] stringByAppendingPathComponent:name]
 
 #define CheckNilAndNull(obj) ((obj == nil || [obj isKindOfClass:[NSNull class]]) ? YES : NO)
 #define kBaseURL @"http://csdtest.acer.com.cn/MobilityCssApi/api/CaseList"

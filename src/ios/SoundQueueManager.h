@@ -8,6 +8,11 @@
 
 #import <Foundation/Foundation.h>
 
+typedef NS_ENUM(NSInteger, FileStatus)  {
+    FileStatusNoUpload,
+    FileStatusPreUpload,
+    FileStatusUploading
+};
 
 typedef NS_ENUM(NSInteger, TaskStatus)  {
     TaskStatusNoUpload,
@@ -21,11 +26,18 @@ typedef NS_ENUM(NSInteger, SessionStatus) {
     SessionStatusBusy = 1
 };
 
-@class UploadTask;
+@interface UploadTask : NSObject
+
+@property (nonatomic, strong) NSString *fileName;
+@property (nonatomic, assign) FileStatus fileStatus;
+
+- (UploadTask *)initWithFileName:(NSString *)pFileName fileStatus:(FileStatus)pFileStatus;
+
+@end
 
 @protocol SoundQueueManagerDelegate <NSObject>
 
-- (void)uploadFinishWithCaseID:(NSString *)pCaseID;
+- (void)uploadFinishWithCaseID:(NSString *)pCaseID succesful:(BOOL)pSuccesful;
 
 @end
 
@@ -36,11 +48,15 @@ typedef NS_ENUM(NSInteger, SessionStatus) {
 + (SoundQueueManager *)sharedInstance;
 - (NSString *)dataPath;
 - (BOOL)uploaderRunning;
-- (void)resumeWithLoginID:(NSString *)pLogninID;
+- (void)startWithUploadFiles:(NSMutableArray *)pUploadFiles loginID:(NSString *)pLoginID;
+- (BOOL)stop;
+- (NSMutableArray *)getAllFiles;
 
 @end
 
 @interface Uploader : NSObject
+
+@property (nonatomic, assign) BOOL stop;
 
 + (Uploader *)sharedInstance;
 
