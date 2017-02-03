@@ -191,7 +191,10 @@
         [_maFilesQueue enumerateObjectsUsingBlock:^(id  _Nonnull task, NSUInteger idx, BOOL * _Nonnull stop) {
             UploadTask *uploadTask = task;
             if ([fileName isEqualToString:uploadTask.fileName]) {
+                NSArray *arrFileAtributes = [uploadTask.fileName componentsSeparatedByString:@"_"];
+                NSString *caseID = arrFileAtributes[0];
                 [result addObject:@{@"FileName":fileName,
+                                    @"CaseID":caseID,
                                     @"FileStatus":@(uploadTask.fileStatus)}];
                 exist = YES;
                 *stop = YES;
@@ -199,7 +202,10 @@
         }];
         
         if (!exist) {
+            NSArray *arrFileAtributes = [fileName componentsSeparatedByString:@"_"];
+            NSString *caseID = arrFileAtributes[0];
             [result addObject:@{@"FileName":fileName,
+                                @"CaseID":caseID,
                                 @"FileStatus":@(FileStatusNoUpload)}];
         }
         
