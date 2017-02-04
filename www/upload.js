@@ -1,5 +1,3 @@
-cordova.define("com.example.upload.upload", function(require, exports, module) { /*global cordova, module*/
-
 module.exports = {
     uploadFinish: function(caseID, succesful)
     {
@@ -18,5 +16,3 @@ module.exports = {
                }
     
 };
-
-});

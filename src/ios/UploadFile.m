@@ -64,7 +64,6 @@
         SoundQueueManager *queue = [SoundQueueManager sharedInstance];
         queue.delegate = self;
         [queue startWithUploadFiles:maFiles loginID:LoginID];
-//        [queue resumeWithLoginID:LoginID];
         
         int runing = [queue uploaderRunning];
         CDVPluginResult* result = [CDVPluginResult
@@ -83,8 +82,10 @@
         
         dispatch_async(dispatch_get_main_queue(), ^{
             NSString *js = [NSString stringWithFormat:@"upload.uploadFinish('%@',%ld);", pCaseID, (NSInteger)pSuccesful];
-
-            [self.webView stringByEvaluatingJavaScriptFromString:js];
+            
+            if ([self.webView isKindOfClass:[UIWebView class]]) {
+                [(UIWebView*)self.webView stringByEvaluatingJavaScriptFromString:js];
+            }
         });
         
     });
