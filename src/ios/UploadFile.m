@@ -81,14 +81,19 @@
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         
         dispatch_async(dispatch_get_main_queue(), ^{
-            NSString *js = [NSString stringWithFormat:@"upload.uploadFinish('%@',%ld);", pCaseID, (NSInteger)pSuccesful];
+            
+            
+            NSString *js = [NSString stringWithFormat:@"uploadFinish('%@',%ld);", pCaseID, (NSInteger)pSuccesful];
             
             if ([self.webView isKindOfClass:[UIWebView class]]) {
                 [(UIWebView*)self.webView stringByEvaluatingJavaScriptFromString:js];
             }
+            
         });
         
     });
+    
+    
 }
 
 - (void)getFilesStatus:(CDVInvokedUrlCommand*)command

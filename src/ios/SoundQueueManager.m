@@ -438,6 +438,12 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
     
     NSData *fullData = [NSData dataWithContentsOfFile:DataPath(fileName)];
     
+    
+    if (fullData.length < pStartPosition) {
+        pCompletionBlock(YES);
+        return;
+    }
+    
     NSLog(@"%@", DataPath(pTaskIdentifier));
     NSData *data = [fullData componentsSeparatedFromByte:pStartPosition];
     _maUploadingQueueForTask = [data componentsSeparatedByChunkSize:(kBlockSize * 1024)];
@@ -446,6 +452,8 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
         pCompletionBlock(YES);
         return;
     }
+    
+    
     
     __block __weak void (^weak_next)(NSInteger);
     void (^next)(NSInteger);
