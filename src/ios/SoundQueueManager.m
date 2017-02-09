@@ -136,10 +136,7 @@
 {
     NSString *fileName = [NSString stringWithFormat:@"%@_%ld", pCaseID, pIndex];
     
-    if (self.delegate != nil && [self.delegate respondsToSelector:@selector(uploadFinishWithCaseID:succesful:)]) {
-        
-        [self.delegate uploadFinishWithCaseID:fileName succesful:YES];
-    }
+    
     
     if ([[NSFileManager defaultManager] fileExistsAtPath:DataPath(fileName)]){
         
@@ -170,6 +167,10 @@
         if (uploadTask) {
             [_maFilesQueue removeObject:uploadTask];
         }
+    }
+    if (self.delegate != nil && [self.delegate respondsToSelector:@selector(uploadFinishWithCaseID:succesful:)]) {
+        
+        [self.delegate uploadFinishWithCaseID:fileName succesful:YES];
     }
     
 }
@@ -458,7 +459,7 @@ static NSString * const kBackgroundRefreshIdentifier = @"com.delawareconsulting.
     __block __weak void (^weak_next)(NSInteger);
     void (^next)(NSInteger);
     weak_next = next = ^(NSInteger index) {
-        if (index == _maUploadingQueueForTask.count - 1) {
+        if (index == _maUploadingQueueForTask.count) {
             NSLog(@"end");
             pCompletionBlock(YES);
             return;
