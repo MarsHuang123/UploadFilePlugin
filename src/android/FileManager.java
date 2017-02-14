@@ -1,10 +1,12 @@
 package upload;
 
+import android.content.Context;
 import android.util.Log;
+
+import java.io.FileInputStream;
 
 import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -31,11 +33,11 @@ public class FileManager {
 	 * Get video's stream.
 	 * @return
 	 */
-	public BufferedInputStream getFileStream() {
+	public BufferedInputStream getFileStream(Context context) {
 
 		BufferedInputStream in = null;
 		try {
-			in = new BufferedInputStream(new FileInputStream(getFileFullPath()), 1204);
+			in = new BufferedInputStream(new FileInputStream(getFileFullPath(context)), 1204);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -46,31 +48,42 @@ public class FileManager {
 		this.fileName = fileName;
 	}
 
-	public String getFilePath() {
-		File f = android.os.Environment.getExternalStorageDirectory();
-
-		return f.getPath() + "/caches/DataForder/";
+	public String getFilePath(Context context) {
+		//File f = android.os.Environment.getExternalStorageDirectory();
+		File f = context.getFilesDir();
+		return f.getPath() + "/files/AudioFolder/";
 	}
 
-	public String getFileFullPath() {
-		File f = android.os.Environment.getExternalStorageDirectory();
-
-		return f.getPath() + "/caches/DataForder/" + fileName + fileSuffix;
+	public String getFileFullPath(Context context) {
+		//File f = android.os.Environment.getExternalStorageDirectory();
+		File f = context.getFilesDir();
+		return f.getPath() + "/files/AudioFolder/" + fileName;
 	}
 
-	public String getFileUplaodedFullPath() {
-		File f = android.os.Environment.getExternalStorageDirectory();
+	public String getFileUplaodedFullPath(Context context) {
+		File f = context.getFilesDir();
 
-		return f.getPath() + "/caches/FinishDataForder/" + fileName + fileSuffix;
+		return f.getPath() + "/files/FinishDataFolder/" + fileName + fileSuffix;
 	}
-	public File getFileDirectory(){
-		File myFile = new File(getFilePath());
-		return myFile;
+
+	public void createFileUploadDir(Context context){
+		File f = context.getFilesDir();
+		File saveFile = new File(f.getAbsoluteFile() + "/files/FinishDataFolder/");
+		if(!saveFile.exists()){
+			saveFile.mkdirs();
+		}
+		Log.e(TAG, "saveFile is....." + saveFile.getAbsolutePath());
+		//return saveFile;
 	}
-	public File getFile(String fileName) {
+
+	public File getFile(Context context, String fileName) {
 		//File SDFile = android.os.Environment.getExternalStorageDirectory();
 
-		File myFile = new File(getFilePath() + fileName + fileSuffix);
+		File myFile = new File(getFilePath(context) + fileName);
+		return myFile;
+	}
+	public File getFileDirectory(Context context){
+		File myFile = new File(getFilePath(context));
 		return myFile;
 	}
 
@@ -79,11 +92,13 @@ public class FileManager {
 		Log.e(TAG, "Delete file....." + fileFullPath);
 		return file.delete();
 	}
-	public void copyFile() {
-		String oldPath = getFileFullPath();
-		String newPath= getFileUplaodedFullPath();
+	public void copyFile(Context context) {
+		createFileUploadDir(context);
+		String oldPath = getFileFullPath(context);
+		String newPath= getFileUplaodedFullPath(context);
 		Log.e(TAG, "Copy file start.....");
 		Log.e(TAG, "oldPath is....." + oldPath);
+		Log.e(TAG, "newPath is....." + newPath);
 		try {
 			long byteSum = 0;
 			int byteRead = 0;

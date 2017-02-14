@@ -20,7 +20,7 @@ public class UploadDataService {
 
         String postJsonString = "{ \"Requests\":{ \"CaseID\":\"" + caseId + "\", \"Index\":\"" + index + "\" } }";
         Log.d(TAG, "postJsonString.... " + postJsonString);
-        String urlString = context.getString(R.string.service_url);
+        String urlString = "http://csdtest.acer.com.cn/MobilityCssApi/api/CaseList";
         urlString = urlString + functionName;
         String response = httpRestServiceCaller.executeHTTPRequest(context, urlString, postJsonString, 45000, HTTPRestServiceCaller.HTTP_POST_METHOD, 0);
         String header = httpRestServiceCaller.getHeader();
@@ -44,7 +44,7 @@ public class UploadDataService {
                 "    }\n" +
                 "}\n";
         Log.d(TAG, "executeUploadVoiceFile...Parmeters...postJsonString.... " + postJsonString);
-        String urlString = context.getString(R.string.service_url);
+        String urlString = "http://csdtest.acer.com.cn/MobilityCssApi/api/CaseList";
         urlString = urlString + functionName;
         String response = httpRestServiceCaller.executeHTTPRequest(context, urlString, postJsonString, 45000, HTTPRestServiceCaller.HTTP_POST_METHOD, totalLength);
         Log.d(TAG, "UploadVoiceFile:::::Response is------------ " + response);

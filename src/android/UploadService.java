@@ -87,7 +87,7 @@ public class UploadService {
                     //String fileName = "8746627_1";
                     uploadingFiles = fileName;
                     FileManager.getInstance().setFileName(fileName);
-                    File f = FileManager.getInstance().getFile(fileName);
+                    File f = FileManager.getInstance().getFile(mContext, fileName);
                     if(f != null){
                         Log.e(TAG, "file is::::" + f.exists());
                         Log.e(TAG, "file is::::" + f.length());
@@ -114,7 +114,13 @@ public class UploadService {
                                 uploadFailed(fileName);
                                 e.printStackTrace();
                             }
+                        }else{
+                            //filesNames.remove(fileName);
+                            uploadFailed(fileName);
                         }
+                    }else{
+                        //filesNames.remove(fileName);
+                        uploadFailed(fileName);
                     }
                 }
             }
@@ -133,7 +139,7 @@ public class UploadService {
     public void upload(File file, long fileProgress, long fileTotalLength, String caseId, String index, String fileName){
         if(file != null){
 
-            BufferedInputStream bin = FileManager.getInstance().getFileStream();
+            BufferedInputStream bin = FileManager.getInstance().getFileStream(mContext);
             Log.e(TAG, "BufferedInputStream is::::" + bin);
             byte[] buffer = new byte[(int) needSize];
             int bytesRead = 0;
@@ -164,7 +170,7 @@ public class UploadService {
                 }
                 if(isSucceed){
                     Log.e(TAG, "The file is uploaded.....");
-                    FileManager.getInstance().copyFile();
+                    FileManager.getInstance().copyFile(mContext);
                     uploadSucceed(fileName);
                 }
             } catch (IOException e) {
@@ -204,7 +210,7 @@ public class UploadService {
         //filesNames.add("8746627_1");
         JSONArray jsonArray = new JSONArray();
 
-        File f = FileManager.getInstance().getFileDirectory();
+        File f = FileManager.getInstance().getFileDirectory(mContext);
         if(f.isDirectory()){
             File[] files = f.listFiles();
             for(int i = 0; i < files.length; i++){
