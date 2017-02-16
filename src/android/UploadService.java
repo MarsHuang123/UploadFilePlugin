@@ -93,9 +93,10 @@ public class UploadService {
                     FileManager.getInstance().setFileName(fileName);
                     File f = FileManager.getInstance().getFile(mContext, fileName);
                     if(f != null){
-                        Log.e(TAG, "file is::::" + f.exists());
-                        Log.e(TAG, "file is::::" + f.length());
-                        Log.e(TAG, "file is::::" + f.isDirectory());
+                        Log.e(TAG, "file's path::::" + f.getAbsolutePath());
+                        Log.e(TAG, "file is exists ::::" + f.exists());
+                        Log.e(TAG, "file's length:::" + f.length());
+                        Log.e(TAG, "file is Directory? ::::" + f.isDirectory());
                         if(f.exists()){
                             String caseId = getCaseId(fileName);
                             String index = fileName.substring(fileName.indexOf("_") + 1);
@@ -222,7 +223,8 @@ public class UploadService {
                 boolean isExist = false;
                 File file = files[i];
                 if(file != null){
-                    String fileNameInSdcard = getFileName(file.getName());
+                    Log.e(TAG, "files name is......" + file.getName());
+                    String fileNameInSdcard = file.getName();
                     Log.e(TAG, "In DataForder files name is......" + fileNameInSdcard);
                     if(fileNameInSdcard != null){
                         if(fileNameInSdcard.equalsIgnoreCase(uploadingFiles)){
@@ -263,9 +265,9 @@ public class UploadService {
         return str.substring(0, str.indexOf("_"));
     }
 
-    private String getFileName(String str){
+/*    private String getFileName(String str){
         return str.substring(0, str.indexOf("."));
-    }
+    }*/
 
     public void stop(){
         isCanceled = true;
