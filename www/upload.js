@@ -1,3 +1,4 @@
+cordova.define("com.example.upload.upload", function(require, exports, module) {
 module.exports = {
     uploadFinish: function(caseID, succesful)
     {
@@ -9,10 +10,11 @@ module.exports = {
         cordova.exec(successCallback, errorCallback, "Upload", "resume", [name, files]);
                },
     getFilesStatus:function (successCallback, errorCallback) {
-        cordova.exec(successCallback, errorCallback, "Upload", "getFilesStatus");
+        cordova.exec(successCallback, errorCallback, "Upload", "getFilesStatus", []);
                },
                stop:function (successCallback, errorCallback) {
                cordova.exec(successCallback, errorCallback, "Upload", "stop");
                }
     
 };
+});
