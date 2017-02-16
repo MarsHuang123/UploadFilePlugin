@@ -11,7 +11,6 @@ import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CordovaWebView;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 /**
  * Created by shig on 2017/2/9.
@@ -21,6 +20,7 @@ public class Upload extends CordovaPlugin {
     private static final String TAG = "Upload";
     public static final String Bundle_Key = "FileName";
     private MyHandler myHandler = null;
+
     /**
      * Constructor.
      */
@@ -66,12 +66,13 @@ public class Upload extends CordovaPlugin {
                     files[i] = array.getString(i);
                 }
                 try {
-                    UploadService.getInstance().uploadFiles(cordova.getActivity().getApplicationContext(), files, caseId, myHandler);
+                    UploadService.getInstance().uploadFiles(cordova.getActivity().getApplication(), files, caseId, myHandler);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
         }else if("getFilesStatus".equalsIgnoreCase(action)){
+            UploadService.getInstance().setContext(cordova.getActivity().getApplication());
             JSONArray array = UploadService.getInstance().getFileStatus();
             callbackContext.success(array);
         }else if("stop".equalsIgnoreCase(action)){

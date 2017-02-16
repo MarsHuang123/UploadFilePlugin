@@ -23,7 +23,7 @@ import java.util.List;
 
 public class UploadService {
 
-    private String []files;
+    private String[]files;
     private String loginId;
     private String TAG = "UploadService";
     private List<String> filesNames = new ArrayList();
@@ -43,10 +43,10 @@ public class UploadService {
     public static boolean isCanceled = false;
     private UploadDataService uploadDataService;
     private Handler handler;
-    private void setProps(String [] files, String loginId, Context mContext, Handler handler){
+    private void setProps(String[] files, String loginId, Context mContext, Handler handler){
         this.files = files;
         this.loginId = loginId;
-        this.mContext = mContext;
+        setContext(mContext);
         this.handler = handler;
         for(String name : files){
             if(!filesNames.contains(name)){
@@ -55,7 +55,11 @@ public class UploadService {
         }
     }
 
-    public void uploadFiles(Context context, String []files, String loginId, Handler handler) throws Exception {
+    public void setContext(Context context){
+        this.mContext = context;
+    }
+
+    public void uploadFiles(Context context, String[]files, String loginId, Handler handler) throws Exception {
         Log.e(TAG, "uploadFiles::::");
         setProps(files, loginId, context, handler);
         uploadDataService  = new UploadDataService();
