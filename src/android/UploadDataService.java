@@ -3,7 +3,6 @@ package upload;
 import android.content.Context;
 import android.util.Log;
 
-import io.cordova.hellocordova.R;
 
 
 /**
