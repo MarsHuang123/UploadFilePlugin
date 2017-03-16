@@ -1,4 +1,3 @@
-cordova.define("com.example.upload.upload", function(require, exports, module) {
 module.exports = {
     uploadFinish: function(caseID, succesful)
     {
@@ -17,4 +16,3 @@ module.exports = {
                }
     
 };
-});
